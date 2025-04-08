@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasty Fast Food - قائمة الطعام</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .restaurant-name {
+            color: #FF8C00;
+            font-size: 14px;
+            text-align: center;
+            flex-grow: 1;
+        }
+        
+        .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .categories {
+            display: flex;
+            overflow-x: auto;
+            background-color: #FF8C00;
+            padding: 10px;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .category-btn {
+            background: none;
+            border: none;
+            color: white;
+            padding: 5px 15px;
+            margin: 0 5px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .category-btn.active {
+            background-color: white;
+            color: #FF8C00;
+            font-weight: bold;
+        }
+        
+        .menu-container {
+            display: none;
+            padding: 15px;
+        }
+        
+        .menu-container.active {
+            display: block;
+        }
+        
+        .menu-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .menu-item {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .item-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+        
+        .item-details {
+            padding: 10px;
+        }
+        
+        .item-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .item-price {
+            color: #FF8C00;
+            font-weight: bold;
+        }
+        
+        .add-to-cart {
+            background-color: #FF8C00;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .add-to-cart:hover {
+            background-color: #e67e00;
+        }
+        
+        .notes-container {
+            padding: 15px;
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .notes-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .notes-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            min-height: 60px;
+        }
+        
+        .cart-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #FF8C00;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #e74c3c;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+        }
+        
+        .cart-container {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
+            transition: bottom 0.3s;
+            z-index: 999;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .cart-container.open {
+            bottom: 0;
+        }
+        
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #FF8C00;
+        }
+        
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .cart-items {
+            margin-bottom: 15px;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-item-name {
+            flex-grow: 1;
+        }
+        
+        .cart-item-price {
+            color: #FF8C00;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+        
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quantity-btn {
+            background-color: #f0f0f0;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .quantity-value {
+            margin: 0 10px;
+        }
+        
+        .remove-item {
+            color: #e74c3c;
+            background: none;
+            border: none;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 15px 0;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        
+        .checkout-btn {
+            background-color: #FF8C00;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .checkout-btn:hover {
+            background-color: #e67e00;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+        
+        .modal-overlay.open {
+            display: flex;
+        }
+        
+        .modal {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #FF8C00;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .submit-order {
+            background-color: #FF8C00;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .submit-order:hover {
+            background-color: #e67e00;
+        }
+        
+        .footer {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .menu-items {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            }
+            
+            .item-image {
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="restaurant-name">Tasty Fast Food</div>
+        <img src="https://via.placeholder.com/60" alt="شعار المطعم" class="logo">
+    </div>
+    
+    <div class="categories">
+        <button class="category-btn active" data-category="pizza">بيتزا</button>
+        <button class="category-btn" data-category="meals">وجبات</button>
+        <button class="category-btn" data-category="special">سبيشل</button>
+        <button class="category-btn" data-category="drinks">مشروبات و مقبلات</button>
+    </div>
+    
+    <!-- Pizza Menu -->
+    <div class="menu-container active" id="pizza-menu">
+        <div class="menu-items">
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="بيتزا دجاج" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">بيتزا دجاج</div>
+                    <div class="item-price">5000 دينار</div>
+                    <button class="add-to-cart" data-name="بيتزا دجاج" data-price="5000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="بيتزا لحم" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">بيتزا لحم</div>
+                    <div class="item-price">6000 دينار</div>
+                    <button class="add-to-cart" data-name="بيتزا لحم" data-price="6000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="بيتزا مشكل" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">بيتزا مشكل</div>
+                    <div class="item-price">6000 دينار</div>
+                    <button class="add-to-cart" data-name="بيتزا مشكل" data-price="6000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="بيتزا گص" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">بيتزا گص</div>
+                    <div class="item-price">6000 دينار</div>
+                    <button class="add-to-cart" data-name="بيتزا گص" data-price="6000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="بيتزا خضروا��" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">بيتزا خضروات</div>
+                    <div class="item-price">4500 دينار</div>
+                    <button class="add-to-cart" data-name="بيتزا خضروات" data-price="4500">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="بيتزا حار" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">بيتزا حار</div>
+                    <div class="item-price">6000 دينار</div>
+                    <button class="add-to-cart" data-name="بيتزا حار" data-price="6000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="بيتزا كالزون" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">بيتزا كالزون</div>
+                    <div class="item-price">6500 دينار</div>
+                    <button class="add-to-cart" data-name="بيتزا كالزون" data-price="6500">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="بيتزا محشي" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">بيتزا محشي</div>
+                    <div class="item-price">6000 دينار</div>
+                    <button class="add-to-cart" data-name="بيتزا محشي" data-price="6000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="بيتزا مارگريتا" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">بيتزا مارگريتا</div>
+                    <div class="item-price">4000 دينار</div>
+                    <button class="add-to-cart" data-name="بيتزا مارگريتا" data-price="4000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="بيتزا تيستي" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">بيتزا تيستي</div>
+                    <div class="item-price">7000 دينار</div>
+                    <button class="add-to-cart" data-name="بيتزا تيستي" data-price="7000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="بيتزا ستيك چكن" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">بيتزا ستيك چكن</div>
+                    <div class="item-price">7000 دينار</div>
+                    <button class="add-to-cart" data-name="بيتزا ستيك چكن" data-price="7000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="بيتزا فنگر" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">بيتزا فنگر</div>
+                    <div class="item-price">4500 دينار</div>
+                    <button class="add-to-cart" data-name="بيتزا فنگر" data-price="4500">إضافة للسلة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Meals Menu -->
+    <div class="menu-container" id="meals-menu">
+        <div class="menu-items">
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="برغر دجاج" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">برغر دجاج</div>
+                    <div class="item-price">3500 دينار</div>
+                    <button class="add-to-cart" data-name="برغر دجاج" data-price="3500">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="برغر لحم" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">برغر لحم</div>
+                    <div class="item-price">4000 دينار</div>
+                    <button class="add-to-cart" data-name="برغر لحم" data-price="4000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="دبل برغر" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">دبل برغر</div>
+                    <div class="item-price">6000 دينار</div>
+                    <button class="add-to-cart" data-name="دبل برغر" data-price="6000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="برغر مكسيكي" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">برغر مكسيكي</div>
+                    <div class="item-price">5000 دينار</div>
+                    <button class="add-to-cart" data-name="برغر مكسيكي" data-price="5000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="برغر زنجر" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">برغر زنجر</div>
+                    <div class="item-price">5000 دينار</div>
+                    <button class="add-to-cart" data-name="برغر زنجر" data-price="5000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="كينغ برغر" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">كينغ برغر</div>
+                    <div class="item-price">6000 دينار</div>
+                    <button class="add-to-cart" data-name="كينغ برغر" data-price="6000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="كص دجاج+فنكر" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">كص دجاج+فنكر</div>
+                    <div class="item-price">3000 دينار</div>
+                    <button class="add-to-cart" data-name="كص دجاج+فنكر" data-price="3000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="كص لحم +فنكر" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">كص لحم +فنكر</div>
+                    <div class="item-price">3500 دينار</div>
+                    <button class="add-to-cart" data-name="كص لحم +فنكر" data-price="3500">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="صاج لحم دبل" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">صاج لحم دبل</div>
+                    <div class="item-price">5000 دينار</div>
+                    <button class="add-to-cart" data-name="صاج لحم دبل" data-price="5000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="صاج دجاج دبل" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">صاج دجاج دبل</div>
+                    <div class="item-price">4000 دينار</div>
+                    <button class="add-to-cart" data-name="صاج دجاج دبل" data-price="4000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="طبق كص لحم" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">طبق كص لحم</div>
+                    <div class="item-price">6500 دينار</div>
+                    <button class="add-to-cart" data-name="طبق كص لحم" data-price="6500">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="طبق كص دجاج" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">طبق كص دجاج</div>
+                    <div class="item-price">5500 دينار</div>
+                    <button class="add-to-cart" data-name="طبق كص دجاج" data-price="5500">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="طبق كص مشكل" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">طبق كص مشكل</div>
+                    <div class="item-price">6000 دينار</div>
+                    <button class="add-to-cart" data-name="طبق كص مشكل" data-price="6000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="سندويش راب" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">سندويش راب</div>
+                    <div class="item-price">5000 دينار</div>
+                    <button class="add-to-cart" data-name="سندويش راب" data-price="5000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="سندويش تيستي" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">سندويش تيستي</div>
+                    <div class="item-price">5000 دينار</div>
+                    <button class="add-to-cart" data-name="سندويش تيستي" data-price="5000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="فيلادلفيا" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">فيلادلفيا</div>
+                    <div class="item-price">6000 دينار</div>
+                    <button class="add-to-cart" data-name="فيلادلفيا" data-price="6000">إضافة للسلة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Special Menu -->
+    <div class="menu-container" id="special-menu">
+        <div class="menu-items">
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="تاكو" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">تاكو</div>
+                    <div class="item-price">6000 دينار</div>
+                    <button class="add-to-cart" data-name="تاكو" data-price="6000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="طبق ستيك دجاج بالمشروم" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">طبق ستيك دجاج بالمشروم</div>
+                    <div class="item-price">6000 دينار</div>
+                    <button class="add-to-cart" data-name="طبق ستيك دجاج بالمشروم" data-price="6000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="طبق ستيك دجاج" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">طبق ستيك دجاج</div>
+                    <div class="item-price">5000 دينار</div>
+                    <button class="add-to-cart" data-name="طبق ستيك دجاج" data-price="5000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="3 قطع صدر دجاج مع فنگر" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">3 قطع صدر دجاج مع فنگر</div>
+                    <div class="item-price">4000 دينار</div>
+                    <button class="add-to-cart" data-name="3 قطع صدر دجاج مع فنگر" data-price="4000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="5قطع صدر دجاج مع فنگر" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">5قطع صدر دجاج مع فنگر</div>
+                    <div class="item-price">6000 دينار</div>
+                    <button class="add-to-cart" data-name="5قطع صدر دجاج مع فنگر" data-price="6000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="ريزو كنتاكي" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">ريزو كنتاكي</div>
+                    <div class="item-price">5000 دينار</div>
+                    <button class="add-to-cart" data-name="ريزو كنتاكي" data-price="5000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="ريزو گص دجاج" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">ريزو گص دجاج</div>
+                    <div class="item-price">5000 دينار</div>
+                    <button class="add-to-cart" data-name="ريزو گص دجاج" data-price="5000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="ريزو گص لحم" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">ريزو گص لحم</div>
+                    <div class="item-price">5000 دينار</div>
+                    <button class="add-to-cart" data-name="ريزو گص لحم" data-price="5000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="پاستا دجاج" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">پاستا دجاج</div>
+                    <div class="item-price">5000 دينار</div>
+                    <button class="add-to-cart" data-name="پاستا دجاج" data-price="5000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="پاستا لحم" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">پاستا لحم</div>
+                    <div class="item-price">5000 دينار</div>
+                    <button class="add-to-cart" data-name="پاستا لحم" data-price="5000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="فنگر تيستي" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">فنگر تيستي</div>
+                    <div class="item-price">3500 دينار</div>
+                    <button class="add-to-cart" data-name="فنگر تيستي" data-price="3500">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="طبق فنگر" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">طبق فنگر</div>
+                    <div class="item-price">2500 دينار</div>
+                    <button class="add-to-cart" data-name="طبق فنگر" data-price="2500">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="طبق وجز" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">طبق وجز</div>
+                    <div class="item-price">3000 دينار</div>
+                    <button class="add-to-cart" data-name="طبق وجز" data-price="3000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="حلقات بصل" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">حلقات بصل</div>
+                    <div class="item-price">2000 دينار</div>
+                    <button class="add-to-cart" data-name="حلقات بصل" data-price="2000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="گلاص فنگر" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">گلاص فنگر</div>
+                    <div class="item-price">1500 دينار</div>
+                    <button class="add-to-cart" data-name="گلاص فنگر" data-price="1500">إضافة للسلة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Drinks Menu -->
+    <div class="menu-container" id="drinks-menu">
+        <div class="menu-items">
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="بيبسي" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">بيبسي</div>
+                    <div class="item-price">500 دينار</div>
+                    <button class="add-to-cart" data-name="بيبسي" data-price="500">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="ديو" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">ديو</div>
+                    <div class="item-price">500 دينار</div>
+                    <button class="add-to-cart" data-name="ديو" data-price="500">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="سفن" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">سفن</div>
+                    <div class="item-price">500 دينار</div>
+                    <button class="add-to-cart" data-name="سفن" data-price="500">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="ميرندا" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">ميرندا</div>
+                    <div class="item-price">500 دينار</div>
+                    <button class="add-to-cart" data-name="ميرندا" data-price="500">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="ماء" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">ماء</div>
+                    <div class="item-price">250 دينار</div>
+                    <button class="add-to-cart" data-name="ماء" data-price="250">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="مقبلات صغير" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">مقبلات صغير</div>
+                    <div class="item-price">2000 دينار</div>
+                    <button class="add-to-cart" data-name="مقبلات صغير" data-price="2000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="مقبلات وسط" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">مقبلات وسط</div>
+                    <div class="item-price">3000 دينار</div>
+                    <button class="add-to-cart" data-name="مقبلات وسط" data-price="3000">إضافة للسلة</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <img src="https://via.placeholder.com/150" alt="مقبلات كبير" class="item-image">
+                <div class="item-details">
+                    <div class="item-name">مقبلات كبير</div>
+                    <div class="item-price">5000 دينار</div>
+                    <button class="add-to-cart" data-name="مقبلات كبير" data-price="5000">إضافة للسلة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notes-container">
+        <label for="notes" class="notes-label">ملاحظات:</label>
+        <textarea id="notes" class="notes-input" placeholder="اكتب ملاحظاتك هنا..."></textarea>
+    </div>
+    
+    <button class="cart-btn">
+        🛒
+        <span class="cart-count">0</span>
+    </button>
+    
+    <div class="cart-container">
+        <div class="cart-header">
+            <div class="cart-title">سلة التسوق</div>
+            <button class="close-cart">×</button>
+        </div>
+        <div class="cart-items">
+            <!-- Cart items will be added here dynamically -->
+        </div>
+        <div class="cart-total">
+            <span>المجموع:</span>
+            <span class="total-price">0 دينار</span>
+        </div>
+        <button class="checkout-btn">إتمام الطلب</button>
+    </div>
+    
+    <div class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">معلومات الزبون</div>
+                <button class="close-modal">×</button>
+            </div>
+            <form id="customer-form">
+                <div class="form-group">
+                    <label for="customer-name" class="form-label">اسم الزبون:</label>
+                    <input type="text" id="customer-name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-address" class="form-label">العنوان:</label>
+                    <input type="text" id="customer-address" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-phone" class="form-label">رقم الهاتف:</label>
+                    <input type="tel" id="customer-phone" class="form-input" required>
+                </div>
+                <button type="submit" class="submit-order">إرسال الطلب</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>عنوان المطعم: كركوك-سوق الحصير</p>
+        <p>رقم هاتف المطعم: 07701236363</p>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Category switching
+            const categoryBtns = document.querySelectorAll('.category-btn');
+            const menuContainers = document.querySelectorAll('.menu-container');
+            
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons and containers
+                    categoryBtns.forEach(b => b.classList.remove('active'));
+                    menuContainers.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Show corresponding menu
+                    const category = this.getAttribute('data-category');
+                    document.getElementById(`${category}-menu`).classList.add('active');
+                });
+            });
+            
+            // Cart functionality
+            const cartBtn = document.querySelector('.cart-btn');
+            const cartContainer = document.querySelector('.cart-container');
+            const closeCartBtn = document.querySelector('.close-cart');
+            const cartItemsContainer = document.querySelector('.cart-items');
+            const cartCount = document.querySelector('.cart-count');
+            const totalPriceElement = document.querySelector('.total-price');
+            const checkoutBtn = document.querySelector('.checkout-btn');
+            const modalOverlay = document.querySelector('.modal-overlay');
+            const closeModalBtn = document.querySelector('.close-modal');
+            const customerForm = document.getElementById('customer-form');
+            const notesInput = document.getElementById('notes');
+            
+            let cart = [];
+            let totalPrice = 0;
+            
+            // Add to cart
+            document.querySelectorAll('.add-to-cart').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const name = this.getAttribute('data-name');
+                    const price = parseInt(this.getAttribute('data-price'));
+                    
+                    // Check if item already exists in cart
+                    const existingItem = cart.find(item => item.name === name);
+                    
+                    if (existingItem) {
+                        existingItem.quantity += 1;
+                    } else {
+                        cart.push({
+                            name,
+                            price,
+                            quantity: 1
+                        });
+                    }
+                    
+                    updateCart();
+                    showCart();
+                });
+            });
+            
+            // Update cart
+            function updateCart() {
+                // Clear cart items
+                cartItemsContainer.innerHTML = '';
+                
+                // Reset total price
+                totalPrice = 0;
+                
+                // Add items to cart
+                cart.forEach((item, index) => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'cart-item';
+                    
+                    itemElement.innerHTML = `
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-price">${item.price} دينار</div>
+                        <div class="cart-item-quantity">
+                            <button class="quantity-btn decrease" data-index="${index}">-</button>
+                            <span class="quantity-value">${item.quantity}</span>
+                            <button class="quantity-btn increase" data-index="${index}">+</button>
+                        </div>
+                        <button class="remove-item" data-index="${index}">×</button>
+                    `;
+                    
+                    cartItemsContainer.appendChild(itemElement);
+                    
+                    // Add to total price
+                    totalPrice += item.price * item.quantity;
+                });
+                
+                // Update cart count and total price
+                cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+                totalPriceElement.textContent = `${totalPrice} دينار`;
+                
+                // Add event listeners to quantity buttons
+                document.querySelectorAll('.decrease').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        if (cart[index].quantity > 1) {
+                            cart[index].quantity -= 1;
+                            updateCart();
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.increase').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        cart[index].quantity += 1;
+                        updateCart();
+                    });
+                });
+                
+                document.querySelectorAll('.remove-item').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        cart.splice(index, 1);
+                        updateCart();
+                    });
+                });
+            }
+            
+            // Show/hide cart
+            function showCart() {
+                cartContainer.classList.add('open');
+            }
+            
+            function hideCart() {
+                cartContainer.classList.remove('open');
+            }
+            
+            cartBtn.addEventListener('click', showCart);
+            closeCartBtn.addEventListener('click', hideCart);
+            
+            // Checkout
+            checkoutBtn.addEventListener('click', function() {
+                if (cart.length === 0) {
+                    alert('السلة فارغة، الرجاء إضافة عناصر أولاً');
+                    return;
+                }
+                
+                modalOverlay.classList.add('open');
+            });
+            
+            // Close modal
+            closeModalBtn.addEventListener('click', function() {
+                modalOverlay.classList.remove('open');
+            });
+            
+            // Submit order
+            customerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('customer-name').value;
+                const address = document.getElementById('customer-address').value;
+                const phone = document.getElementById('customer-phone').value;
+                const notes = notesInput.value;
+                
+                // Prepare order message
+                let message = `طلب جديد من Tasty Fast Food\n\n`;
+                message += `اسم الزبون: ${name}\n`;
+                message += `العنوان: ${address}\n`;
+                message += `رقم الهاتف: ${phone}\n\n`;
+                message += `الطلبات:\n`;
+                
+                cart.forEach(item => {
+                    message += `${item.name} - ${item.quantity} × ${item.price} = ${item.quantity * item.price} دينار\n`;
+                });
+                
+                message += `\nالمجموع: ${totalPrice} دينار\n`;
+                
+                if (notes) {
+                    message += `\nملاحظات: ${notes}`;
+                }
+                
+                // Encode message for WhatsApp
+                const encodedMessage = encodeURIComponent(message);
+                
+                // Send to WhatsApp
+                window.open(`https://wa.me/9647701236363?text=${encodedMessage}`, '_blank');
+                
+                // Reset cart and close modal
+                cart = [];
+                updateCart();
+                hideCart();
+                modalOverlay.classList.remove('open');
+                customerForm.reset();
+                notesInput.value = '';
+                
+                alert('تم إرسال طلبك بنجاح! شكراً لاختيارك Tasty Fast Food');
+            });
+        });
+    </script>
+</body>
+</html>
