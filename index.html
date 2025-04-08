@@ -1244,3 +1244,285 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasty Fast Food - قائمة الطعام</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #FF6B00;
+            --primary-dark: #E05D00;
+            --secondary-color: #FFA726;
+            --accent-color: #FFD54F;
+            --dark-color: #2C3E50;
+            --light-color: #F5F5F5;
+            --white: #FFFFFF;
+            --text-color: #333333;
+            --gray: #95A5A6;
+            --success-color: #27AE60;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            font-size: 14px; /* تصغير حجم الخط الأساسي */
+        }
+        
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--white);
+            padding: 1rem 0; /* تصغير الحشو */
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* تصغير الظل */
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .restaurant-name h1 {
+            font-size: 1.5rem; /* تصغير حجم العنوان */
+            font-weight: 900;
+            margin-bottom: 0.3rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .restaurant-name p {
+            font-size: 0.8rem; /* تصغير حجم النص الثانوي */
+            opacity: 0.9;
+        }
+        
+        .logo-container {
+            width: 70px; /* تصغير حجم الشعار */
+            height: 70px;
+            border-radius: 50%;
+            background-color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 2px solid var(--accent-color);
+        }
+        
+        /* Categories Styles */
+        .categories {
+            padding: 0.6rem 0.8rem; /* تصغير الحشو */
+        }
+        
+        .category-btn {
+            padding: 0.4rem 1rem; /* تصغير الحشو */
+            font-size: 0.85rem; /* تصغير حجم الخط */
+            margin: 0 0.2rem;
+        }
+        
+        /* Menu Container */
+        .menu-container {
+            padding: 1rem; /* تصغير الحشو */
+        }
+        
+        .section-title {
+            font-size: 1.2rem; /* تصغير حجم العنوان */
+            margin-bottom: 1rem;
+        }
+        
+        .menu-items {
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); /* تصغير عرض العناصر */
+            gap: 1rem; /* تصغير المسافة بين العناصر */
+        }
+        
+        .item-image-container {
+            height: 120px; /* تصغير ارتفاع الصور */
+        }
+        
+        .item-name {
+            font-size: 0.95rem; /* تصغير حجم النص */
+            margin-bottom: 0.3rem;
+        }
+        
+        .item-description {
+            font-size: 0.8rem; /* تصغير حجم الوصف */
+            margin-bottom: 0.5rem;
+        }
+        
+        .item-price {
+            font-size: 1rem; /* تصغير حجم السعر */
+        }
+        
+        .add-to-cart {
+            padding: 0.4rem 0.6rem; /* تصغير الحشو */
+            font-size: 0.85rem; /* تصغير حجم الخط */
+            margin-top: 0.5rem;
+        }
+        
+        /* Notes Section */
+        .notes-container {
+            padding: 1rem; /* تصغير الحشو */
+            margin: 1rem auto; /* تصغير الهوامش */
+        }
+        
+        .notes-label {
+            font-size: 1rem; /* تصغير حجم العنوان */
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Cart Button */
+        .cart-btn {
+            width: 60px; /* تصغير حجم الزر */
+            height: 60px;
+            font-size: 1.2rem;
+            bottom: 1.5rem;
+            left: 1.5rem;
+        }
+        
+        .cart-count {
+            width: 24px; /* تصغير حجم العداد */
+            height: 24px;
+            font-size: 0.8rem;
+        }
+        
+        /* Cart Container */
+        .cart-container {
+            padding: 1rem; /* تصغير الحشو */
+        }
+        
+        .cart-title {
+            font-size: 1.2rem; /* تصغير حجم العنوان */
+        }
+        
+        .cart-item-name {
+            font-size: 0.9rem; /* تصغير حجم النص */
+        }
+        
+        .cart-item-price {
+            font-size: 0.9rem; /* تصغير حجم السعر */
+            min-width: 60px;
+        }
+        
+        .quantity-btn {
+            width: 25px; /* تصغير حجم الأزرار */
+            height: 25px;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            padding: 1.2rem; /* تصغير الحشو */
+        }
+        
+        .modal-title {
+            font-size: 1.2rem; /* تصغير حجم العنوان */
+        }
+        
+        /* Footer Styles */
+        .footer {
+            padding: 1.5rem 1rem; /* تصغير الحشو */
+        }
+        
+        .footer-section h3 {
+            font-size: 1.1rem; /* تصغير حجم العناوين */
+        }
+        
+        .footer-section p {
+            font-size: 0.8rem; /* تصغير حجم النص */
+        }
+        
+        /* تعديلات خاصة للشاشات الصغيرة جدًا */
+        @media (max-width: 400px) {
+            .menu-items {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 0.8rem;
+            }
+            
+            .item-image-container {
+                height: 100px;
+            }
+            
+            .category-btn {
+                padding: 0.3rem 0.8rem;
+                font-size: 0.8rem;
+            }
+            
+            .restaurant-name h1 {
+                font-size: 1.3rem;
+            }
+        }
+        
+        @media (max-width: 350px) {
+            .menu-items {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo-container {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .restaurant-name h1 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+    <!-- باقي الكود يبقى كما هو -->
+</head>
+<body>
+    <!-- باقي الهيكل يبقى كما هو -->
+    
+    <script>
+        // يمكنك إضافة هذا الكود JavaScript لتكبير العناصر عند النقر عليها للرؤية الأفضل
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuItems = document.querySelectorAll('.menu-item');
+            
+            menuItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (!e.target.classList.contains('add-to-cart')) {
+                        this.classList.toggle('zoomed');
+                    }
+                });
+            });
+            
+            // إضافة تأثير التكبير/التصغير في CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                .menu-item.zoomed {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 90%;
+                    height: auto;
+                    z-index: 1002;
+                    box-shadow: 0 0 0 1000px rgba(0,0,0,0.8);
+                    animation: zoomIn 0.3s ease;
+                }
+                
+                @keyframes zoomIn {
+                    from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+                    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
