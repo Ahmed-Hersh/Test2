@@ -469,6 +469,26 @@
             border-top: 2px dashed var(--accent-color);
         }
         
+        .delivery-fee {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 1rem;
+            margin: 0.5rem 0;
+            color: var(--dark-color);
+        }
+        
+        .total-with-delivery {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 800;
+            font-size: 1.3rem;
+            margin: 1rem 0;
+            padding-top: 0.8rem;
+            border-top: 2px solid var(--primary-color);
+            color: var(--primary-dark);
+        }
+        
         /* Notes Section in Cart */
         .cart-notes-container {
             margin: 1rem 0;
@@ -673,6 +693,31 @@
             font-size: 1.1rem;
         }
         
+        /* Restaurant Info */
+        .restaurant-info {
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            background-color: var(--white);
+            border-top: 1px solid #eee;
+        }
+        
+        .restaurant-info p {
+            margin: 0.5rem 0;
+            color: var(--dark-color);
+            font-size: 1rem;
+        }
+        
+        .restaurant-info .address {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        
+        .restaurant-info .phone {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
         /* Responsive Adjustments */
         @media (max-width: 768px) {
             .header-content {
@@ -759,6 +804,14 @@
                 font-size: 0.75rem;
                 padding: 0.4rem;
             }
+            
+            .restaurant-info {
+                padding: 1rem;
+            }
+            
+            .restaurant-info p {
+                font-size: 0.9rem;
+            }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -817,6 +870,12 @@
         </div>
     </div>
     
+    <!-- Restaurant Info -->
+    <div class="restaurant-info">
+        <p class="address">العنوان: كركوك - سوق الحصير</p>
+        <p class="phone">رقم الهاتف: 07701236363</p>
+    </div>
+    
     <!-- Floating Cart Button -->
     <button class="cart-btn">
         <i class="fas fa-shopping-cart"></i>
@@ -833,8 +892,16 @@
             <!-- Cart items will be added here dynamically -->
         </div>
         <div class="cart-total">
-            <span>المجموع الكلي:</span>
+            <span>المجموع:</span>
             <span class="total-price">0 دينار</span>
+        </div>
+        <div class="delivery-fee">
+            <span>رسوم التوصيل:</span>
+            <span class="delivery-price">1500 دينار</span>
+        </div>
+        <div class="total-with-delivery">
+            <span>المجموع الكلي:</span>
+            <span class="total-with-delivery-price">1500 دينار</span>
         </div>
         
         <!-- Notes Section in Cart -->
@@ -887,7 +954,7 @@
                 { name: "بيتزا تيستي", price: 7000, description: "بيتزا مميزة بالصوص الخاص", image: "images/pizza10.jpg" },
                 { name: "بيتزا ستيك چكن", price: 7000, description: "بيتزا بشرائح ستيك الدجاج", image: "images/pizza11.jpg" },
                 { name: "بيتزا فنگر", price: 4500, description: "بيتزا بأصابع الدجاج المقرمشة", image: "images/pizza12.jpg" },
-                { name: "بيتزا صوصج", price: 6000, description: "بيتزا بالصوص الخاص بالجبنة", image: "images/pizza13.jpg" }
+                { name: "بيتزا صوصج", price: 6000, description: "بيتزا بالصوص الخاص بالجبنة", image: "images/pizza1.jpg" }
             ],
             meals: [
                 { name: "برغر دجاج", price: 3500, description: "برغر دجاج مع الخضار والصوص", image: "images/burger1.jpg" },
@@ -994,6 +1061,7 @@
             const cartItemsContainer = document.querySelector('.cart-items');
             const cartCount = document.querySelector('.cart-count');
             const totalPriceElement = document.querySelector('.total-price');
+            const totalWithDeliveryElement = document.querySelector('.total-with-delivery-price');
             const checkoutBtn = document.querySelector('.checkout-btn');
             const checkoutModal = document.getElementById('checkout-modal');
             const closeModalBtn = document.querySelector('.close-modal');
@@ -1002,6 +1070,7 @@
             
             let cart = [];
             let totalPrice = 0;
+            const deliveryFee = 1500;
             
             // Add to cart
             document.addEventListener('click', function(e) {
@@ -1067,6 +1136,7 @@
                 const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
                 cartCount.textContent = itemCount;
                 totalPriceElement.textContent = `${totalPrice} دينار`;
+                totalWithDeliveryElement.textContent = `${totalPrice + deliveryFee} دينار`;
                 
                 // Show/hide cart count
                 cartCount.style.display = itemCount > 0 ? 'flex' : 'none';
@@ -1160,7 +1230,9 @@
                     message += `- ${item.name} (${item.quantity} × ${item.price}) = ${item.quantity * item.price} دينار\n`;
                 });
                 
-                message += `\n💰 *المجموع الكلي:* ${totalPrice} دينار\n`;
+                message += `\n💰 *المجموع:* ${totalPrice} دينار\n`;
+                message += `🚚 *رسوم التوصيل:* ${deliveryFee} دينار\n`;
+                message += `💵 *المجموع الكلي:* ${totalPrice + deliveryFee} دينار\n`;
                 
                 if (notes) {
                     message += `\n📝 *ملاحظات:* ${notes}`;
