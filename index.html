@@ -718,6 +718,35 @@
             color: var(--primary-color);
         }
         
+        /* Closed Message */
+        .closed-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--danger-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 700;
+            z-index: 1001;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        /* Working Hours */
+        .working-hours {
+            text-align: center;
+            padding: 1rem;
+            background-color: var(--white);
+            border-top: 1px solid #eee;
+            font-size: 0.9rem;
+            color: var(--dark-color);
+        }
+        
+        .working-hours strong {
+            color: var(--primary-dark);
+        }
+        
         /* Responsive Adjustments */
         @media (max-width: 768px) {
             .header-content {
@@ -812,11 +841,20 @@
             .restaurant-info p {
                 font-size: 0.9rem;
             }
+            
+            .working-hours {
+                font-size: 0.8rem;
+            }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    <!-- Closed Message (will be shown/hidden by JavaScript) -->
+    <div class="closed-message" id="closed-message" style="display: none;">
+        <i class="fas fa-store-slash"></i> المطعم مغلق حالياً. أوقات العمل: السبت-الخميس 10:00 صباحاً إلى 11:45 مساءً | الجمعة 3:00 مساءً إلى 12:00 منتصف الليل
+    </div>
+    
     <!-- Header Section -->
     <header class="header">
         <div class="header-content">
@@ -874,6 +912,11 @@
     <div class="restaurant-info">
         <p class="address">العنوان: كركوك - سوق الحصير</p>
         <p class="phone">رقم الهاتف: 07701236363</p>
+    </div>
+    
+    <!-- Working Hours -->
+    <div class="working-hours">
+        <p><strong>أوقات العمل:</strong> السبت-الخميس من 10:00 صباحاً إلى 11:45 مساءً | الجمعة من 3:00 مساءً إلى 12:00 منتصف الليل</p>
     </div>
     
     <!-- Floating Cart Button -->
@@ -1032,8 +1075,50 @@
             }
         }
 
+        // Check if restaurant is open
+        function checkRestaurantOpen() {
+            const now = new Date();
+            const day = now.getDay(); // 0 is Sunday, 6 is Saturday
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const currentTime = hours * 100 + minutes;
+            
+            // Friday hours: 3:00 PM (15:00) to 12:00 AM (24:00)
+            if (day === 5) { // Friday
+                if (currentTime < 1500 || currentTime >= 2400) {
+                    return false;
+                }
+            } 
+            // Other days hours: 10:00 AM (10:00) to 11:45 PM (23:45)
+            else {
+                if (currentTime < 1000 || currentTime >= 2345) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             generateMenuItems();
+            
+            // Check if restaurant is open and show message if closed
+            const closedMessage = document.getElementById('closed-message');
+            if (!checkRestaurantOpen()) {
+                closedMessage.style.display = 'block';
+                
+                // Disable add to cart buttons
+                document.querySelectorAll('.add-to-cart').forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.6';
+                    btn.style.cursor = 'not-allowed';
+                });
+                
+                // Disable checkout button
+                document.querySelector('.checkout-btn').disabled = true;
+                document.querySelector('.checkout-btn').style.opacity = '0.6';
+                document.querySelector('.checkout-btn').style.cursor = 'not-allowed';
+            }
             
             // Category switching
             const categoryBtns = document.querySelectorAll('.category-btn');
@@ -1076,6 +1161,13 @@
             document.addEventListener('click', function(e) {
                 if (e.target.classList.contains('add-to-cart') || e.target.closest('.add-to-cart')) {
                     const btn = e.target.classList.contains('add-to-cart') ? e.target : e.target.closest('.add-to-cart');
+                    
+                    // Check if restaurant is closed
+                    if (!checkRestaurantOpen()) {
+                        showSuccessMessage('المطعم مغلق حالياً', 'الرجاء المحاولة خلال أوقات العمل');
+                        return;
+                    }
+                    
                     const name = btn.getAttribute('data-name');
                     const price = parseInt(btn.getAttribute('data-price'));
                     
@@ -1191,7 +1283,13 @@
             // Checkout
             checkoutBtn.addEventListener('click', function() {
                 if (cart.length === 0) {
-                    alert('السلة فارغة، الرجاء إضافة عناصر أولاً');
+                    showSuccessMessage('السلة فارغة', 'الرجاء إضافة عناصر أولاً');
+                    return;
+                }
+                
+                // Check if restaurant is closed
+                if (!checkRestaurantOpen()) {
+                    showSuccessMessage('المطعم مغلق حالياً', 'لا يمكن إتمام الطلب خارج أوقات العمل');
                     return;
                 }
                 
